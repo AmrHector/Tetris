@@ -1,29 +1,123 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hello Rigo with Vanilla.js</title>
-    <link
-      rel="stylesheet"
-      href="https://use.fontawesome.com/releases/v5.2.0/css/all.css"
-      integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ"
-      crossorigin="anonymous"
-    />
-    <link rel="shortcut icon" href="./4geeks.ico" />
-  </head>
-  <body>
-    <div class="container-fluid text-center">
-      <h1 class="mt-5">Hello Rigo!</h1>
-      <img src="./rigo-baby.jpg" />
-      <p class="alert alert-warning mt-4">
-        If this text is <b>not</b> centered and <b>yellow</b>, you probably have
-        an error
-      </p>
-      <div class="fixed-bottom p-4">
-        Made with ❤️ by
-        <a href="https://www.4geeksacademy.com">4Geeks Academy</a>
-      </div>
-    </div>
-  </body>
-</html>
+<table id="t" style="border: 5px solid;"></table>
+<script>
+    var w = 10,
+      h = 20,
+      colors = ["white", "red", "green", "blue", "yellow", "purple", "orange"];
+    var pieces = [
+      [
+        [1, 1],
+        [1, 1]
+      ],
+      [
+        [0, 0, 0],
+        [2, 2, 2],
+        [0, 0, 0]
+      ],
+      [
+        [0, 0, 0],
+        [0, 3, 3],
+        [3, 3, 0]
+      ],
+      [
+        [0, 0, 0],
+        [4, 4, 0],
+        [0, 4, 4]
+      ],
+      [
+        [0, 0, 0],
+        [5, 0, 0],
+        [5, 5, 5]
+      ],
+      [
+        [0, 0, 0],
+        [0, 0, 6],
+        [6, 6, 6]
+      ]
+    ];
+    function init() {
+      var field = [];
+      var table = document.getElementById("t");
+      for (var i = 0; i < h; i++) {
+        var tr = document.createElement("tr");
+        var row = [];
+        for (var j = 0; j < w; j++) {
+          var td = document.createElement("td");
+          td.classList.add("cell");
+          row.push({ value: 0, element: td });
+          tr.appendChild(td);
+        }
+        field.push(row);
+        table.appendChild(tr);
+      }
+      return field;
+    }
+    function draw(field, piece, px, py) {
+      function drawCell(field, x, y, c) {
+        field[y][x].element.style = "background-color:" + colors[c];
+      }
+      for (var y = 0; y < field.length; y++) {
+        var row = field[y];
+        for (var x = 0; x < row.length; x++) {
+          drawCell(field, x, y, row[x].value);
+        }
+      }
+      for (var y = 0; y < piece.length; y++) {
+        var row = piece[y];
+        for (var x = 0; x < row.length; x++) {
+          if (pX + x < w && pY + y < h && row[x] > 0)
+            drawCell(field, pX + x, pY + y, row[x]);
+        }
+      }
+    }
+    function validPosition(field, piece, pX, pY) {
+      for (var y = 0; y < piece.length; y++) {
+        var row = piece[y];
+        for (var x = 0; x < row.length; x++) {
+          if (row[x] > 0) {
+            if (
+              pX + x < 0 ||
+              pX + x >= w ||
+              pY + y >= h ||
+              field[pY + y][pX + x].value > 0
+            ) {
+              return false;
+            }
+          }
+        }
+      }
+      return true;
+    }
+
+  function  function game() {
+      var field = init();
+      var piece, pX, pY;
+      var int = setInterval(function() {
+        if (!piece) {
+          piece = pieces[Math.floor(Math.random() * pieces.length)];
+          pX = w / 2 - 1;
+          pY = 0;
+        }
+        if (validPosition(field, piece, pX, pY + 1)) {
+          pY++;
+        } else {
+          piece = null;
+        }
+        draw(field, piece, pX, pY);
+      }, 300);
+      document.addEventListener("keydown", function(e) {
+        if (e.key == 37 && validPosition(field, piece, pX - 1, pY)) pX--;
+        if (e.key == 39 && validPosition(field, piece, pX + 1, pY)) pX++;
+        if (e.key == 32) {
+          while (validPosition(field, piece, pX, pY + 1)) pY++;
+        }
+      });
+    }
+    game();
+</script>
+<style>
+  .cell {
+    width: 30px;
+    height: 30px;
+    border: 1px solid black;
+  }
+</style>
